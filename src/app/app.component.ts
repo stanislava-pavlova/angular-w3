@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, ViewChild } from '@angular/core';
+import { FormsModule, NgForm } from '@angular/forms';
 import { RouterOutlet } from '@angular/router';
 
 type Note = {
@@ -23,15 +23,30 @@ export class AppComponent {
   public notes: Note[] = [];
   public noteTitle: string = '';
   public noteContent: string = '';
+  public editMode: boolean = false;
+  public editedNoteId: string = '';
+
+  @ViewChild('noteForm') noteForm!: NgForm;
 
   public saveNote() {
-    this.notes.push({
-      id: crypto.randomUUID(),
-      title: this.noteTitle,
-      content: this.noteContent,
-      isActive: false,
-    });
-
+    if (this.editMode) {
+      const editedNoteIndex = this.notes.findIndex(
+        (note) => note.id === this.editedNoteId
+      );
+      this.notes[editedNoteIndex].title = this.noteTitle;
+      this.notes[editedNoteIndex].content = this.noteContent;
+      this.notes[editedNoteIndex].isActive = false;
+      this.editMode = false;
+      this.editedNoteId = '';
+    } else {
+      this.notes.push({
+        id: crypto.randomUUID(),
+        title: this.noteTitle,
+        content: this.noteContent,
+        isActive: false,
+      });
+    }
+    this.noteForm.reset();
     this.resetTempData();
   }
 
@@ -47,5 +62,12 @@ export class AppComponent {
 
   public deleteNote(note: Note) {
     this.notes = this.notes.filter((n) => n.id !== note.id);
+  }
+
+  public editNote(note: Note) {
+    this.editMode = true;
+    this.noteTitle = note.title;
+    this.noteContent = note.content;
+    this.editedNoteId = note.id;
   }
 }

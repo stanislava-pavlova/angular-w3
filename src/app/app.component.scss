@@ -2,6 +2,10 @@
   text-align: center;
 }
 
+.text-errored {
+  color: #d30303;
+}
+
 .container {
   margin-top: 5rem;
   display: flex;
@@ -69,6 +73,4 @@
       background-color: #af0101;
     }
   }
-
-  
 }
