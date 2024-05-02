@@ -1,7 +1,7 @@
 <h1 class="text-align-center">{{ title }}</h1>
 <div class="container">
   <div class="form-container">
-    <form #noteForm="ngForm" (ngSubmit)="saveNote()" class="form">
+    <form #noteForm="ngForm" (ngSubmit)="saveNote()" class="flex-column form">
       <input
         id="title"
         name="title"
@@ -11,23 +11,20 @@
         required
         minlength="5"
         class="form-control"
+        #titleInput="ngModel"
+        [ngClass]="{
+          'error-border':
+            titleInput.invalid && (titleInput.dirty || titleInput.touched)
+        }"
       />
 
       <div
-        *ngIf="
-          noteForm.controls['title']?.invalid &&
-          (noteForm.controls['title']?.dirty ||
-            noteForm.controls['title']?.touched)
-        "
+        *ngIf="titleInput.invalid && (titleInput.dirty || titleInput.touched)"
       >
-        <small
-          class="text-errored"
-          *ngIf="noteForm.controls['title']?.errors?.['required']"
+        <small class="text-errored" *ngIf="titleInput.errors?.['required']"
           >Title is required</small
         >
-        <small
-          class="text-errored"
-          *ngIf="noteForm.controls['title']?.errors?.['minlength']"
+        <small class="text-errored" *ngIf="titleInput.errors?.['minlength']"
           >Title must be at least 5 characters long</small
         >
       </div>
@@ -41,23 +38,22 @@
         required
         minlength="7"
         class="form-control"
+        #contentInput="ngModel"
+        [ngClass]="{
+          'error-border':
+            contentInput.invalid && (contentInput.dirty || contentInput.touched)
+        }"
       ></textarea>
 
       <div
         *ngIf="
-          noteForm.controls['content']?.invalid &&
-          (noteForm.controls['content']?.dirty ||
-            noteForm.controls['content']?.touched)
+          contentInput.invalid && (contentInput.dirty || contentInput.touched)
         "
       >
-        <small
-          class="text-errored"
-          *ngIf="noteForm.controls['content']?.errors?.['required']"
+        <small class="text-errored" *ngIf="contentInput.errors?.['required']"
           >Content is required</small
         >
-        <small
-          class="text-errored"
-          *ngIf="noteForm.controls['content']?.errors?.['minlength']"
+        <small class="text-errored" *ngIf="contentInput.errors?.['minlength']"
           >Content must be at least 7 characters long</small
         >
       </div>
@@ -72,9 +68,12 @@
     </form>
   </div>
 
-  <div class="notes-list-container">
+  <div class="notes-list-container flex-column">
+    <div *ngIf="!notes.length">
+      <p>There are no notes to display.</p>
+    </div>
     <div *ngFor="let note of notes" (click)="makeActive(note)">
-      <div class="card">
+      <div class="card" [ngClass]="{ active: note.isActive }">
         <div class="card-header">
           {{ note.title }}
         </div>
@@ -83,9 +82,11 @@
         </div>
       </div>
 
-      <div *ngIf="note.isActive">
+      <div *ngIf="note.isActive" class="btns-container">
         <button class="btn btn-primary" (click)="editNote(note)">Edit</button>
-        <button class="btn btn-red" (click)="deleteNote(note)">Delete</button>
+        <button class="btn btn-secondary" (click)="deleteNote(note)">
+          Delete
+        </button>
       </div>
     </div>
   </div>
